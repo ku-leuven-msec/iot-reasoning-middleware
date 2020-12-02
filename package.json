@@ -1,0 +1,24 @@
+{
+  "name": "@distrinet/reasoning-middleware",
+  "version": "1.0.0",
+  "description": "a Prolog based IoT reasoning middleware in JavaScript",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ku-leuven-msec/iot-reasoning-middleware.git"
+  },
+  "keywords": [
+    "reasoning",
+    "middleware",
+    "internet-of-things",
+    "Prolog",
+    "JavaScript"
+  ],
+  "author": "Ilse Bohé & Jorn Lapon <firstname.lastname@kuleuven.be>",
+  "dependencies": {
+    "tau-prolog": "^0.3.0"
+  }
+}

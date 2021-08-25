@@ -6,7 +6,7 @@ handle(Event) :-
         event_subject(Event, Subj),
         asset(Subj, device),
         % TODO: sent to framework
-        info(['TODO', device, Subj]).
+        trigger_external_event('action', Event).
 
-init:- bind_external_event(this, device_event, Event, (forward(Event, device))).
+init:- bind_external_event(device_event, Event, (forward(Event, device))).
 

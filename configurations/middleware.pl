@@ -2,6 +2,8 @@
 % connections between modules describe to which events a module subscribed (based on the sender of the event and the type of event)
 connection(app, access_control, action).
 connection(app, query, query).
+connection(query, app, 'query-result').
+
 connection(access_control, app, update).
 connection(access_control, bus, action).
 connection(access_control, bus, query).

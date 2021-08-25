@@ -19,6 +19,6 @@
   ],
   "author": "Ilse Bohe & Jorn Lapon <firstname.lastname@kuleuven.be>",
   "dependencies": {
-    "tau-prolog": "^0.3.0"
+    "tau-prolog": "^0.3.1"
   }
 }

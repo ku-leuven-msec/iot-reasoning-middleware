@@ -4,14 +4,14 @@
 :- use_module(library(connector)).
 
 handle(Event) :-
+info(['in handle query']),
        event_id(Event, EId),
        event_query(Event, Query),
        event_return_terms(Event,TermList),
        info(['QUERY', Query]),
        handle_query(Query, TermList, Result),
-       create_query_result_event(NewEvent, EId, Result),
        info(['QUERYRESULT', Result]),
-
+       create_query_result_event(NewEvent, EId, Result),
        forward(NewEvent, query).
 
 handle_query(Query, TermList, Result):-

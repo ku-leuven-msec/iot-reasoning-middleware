@@ -16,12 +16,16 @@
 
 
 :- use_module('./configurations/middleware.pl').
-:- use_module('./configurations/environment.pl').
+%:- use_module('./configurations/environment.pl').
+:- use_module('./configurations/environment_10000_1+persons.pl').
+
+:- use_module('./configurations/access_control.pl').
 
 
 %init rule - must be executed to start the reasoning
 %executes init in module in case it exists
 init :-
+    info(['init']),
    get_modules(Modules),
     % TODO dynamic loading of modules --> future work
     % load_modules(Modules),
@@ -45,7 +49,7 @@ get_modules(ModuleNames) :-
         forall(member(ModuleName, ModuleNames), retract(module_name(ModuleName))).
 
 load_modules(Modules) :-
-    %TODO: load modules
+    % TODO: load modules
     write('TODO').
 % forall(member(Module, Modules), (absolute_file_name( Module, Path ))).
 
@@ -54,5 +58,5 @@ load_modules(Modules) :-
 %forward(+Event, +Sender) handles an incoming event and send it to the connected modules (based on the connections in ./configurations/middleware.pl)
  forward(Event, Sender) :-
        event_type(Event, Type),
-       info(['FORWARD', Sender,Type]),
-       forall(connection(Sender, Dest, Type),(Dest:handle(Event);true)).
+       info(['FORWARD', 'from:', Sender, 'event-type:',Type]),
+       forall(connection(Sender, Dest, Type),((Dest:handle(Event));true)).

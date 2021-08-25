@@ -66,9 +66,9 @@ var plEngine;
             },
             // EVENTS
             // bind/4
-            "bind_external_event/4": function( thread, point, atom ) {
-                var elem = atom.args[0], type = atom.args[1], event = atom.args[2], goal = atom.args[3];
-                if( pl.type.is_variable( elem ) || pl.type.is_variable( type ) && pl.type.is_variable( goal ) ) {
+            "bind_external_event/3": function( thread, point, atom ) {
+                var type = atom.args[0], event = atom.args[1], goal = atom.args[2];
+                if( pl.type.is_variable( type ) && pl.type.is_variable( goal ) ) {
                     thread.throw_error( pl.error.instantiation( atom.indicator ) );
                 }
                 else if( !pl.type.is_atom( type ) ) {
@@ -77,7 +77,7 @@ var plEngine;
                 else if( !pl.type.is_variable( event ) && !pl.type.is_io_event_object( event ) ) {
                     thread.throw_error( pl.error.type( "IOEventObject", type, atom.indicator ) );
                 }
-                else if( !pl.type.is_variable( goal ) ) {
+                else {
                     var thread_ = new pl.type.Thread( thread.session );
                     var eventObject = new pl.type.IOEvent( type.id );
                     var links = {};
@@ -92,14 +92,6 @@ var plEngine;
                     events.add( type.id, handler );
 
                     thread.prepend( [new pl.type.State( point.goal.replace( new pl.type.Term( "=", [eventObject, event] ) ), point.substitution, point )] );
-                } else {
-                    var event = elem.object.tau_events ? elem.object.tau_events[type.id] : undefined;
-                    if( event !== undefined ) {
-                        var states = [];
-                        for( var i = 0; i < event.length; i++ )
-                            states.push( new pl.type.State( point.goal.replace( new pl.type.Term( "=", [goal, event[i].goal.rename(thread)] ) ), point.substitution, point ) );
-                        thread.prepend( states );
-                    }
                 }
             },
 
@@ -108,55 +100,57 @@ var plEngine;
             // ],
 
             // apply/4
-            "trigger_external_event/3": function( thread, point, atom ) {
-                var source = atom.args[0], type = atom.args[1], value = atom.args[2];
+            "trigger_external_event/2": function( thread, point, atom ) {
+                var type = atom.args[0], value = atom.args[1];
                 var context =pl.fromJavaScript.apply(pl.__env);
                 // var context = new pl.type.Term("global");
-                var name = new pl.type.Term("triggerEvent");
-                if( pl.type.is_variable( context ) || pl.type.is_variable( name ) || pl.type.is_variable( source ) || pl.type.is_variable( type ) || pl.type.is_variable( value )) {
+                var name = new pl.type.Term("handlePrologEvent");
+                if( pl.type.is_variable( context ) || pl.type.is_variable( name )  || pl.type.is_variable( type ) || pl.type.is_variable( value )) {
                     thread.throw_error( pl.error.instantiation( atom.indicator ) );
                 } else if( !pl.type.is_atom( name ) && (!pl.type.is_js_object( name ) || typeof name.value !== "function") ) {
                     thread.throw_error( pl.error.type( "atom_or_JSValueFUNCTION", name, atom.indicator ) );
-                } else if( !pl.type.is_list( source ) ) {
-                    thread.throw_error( pl.error.type( "list", args, atom.indicator ) );
-                }
-                var ctx = context.toJavaScript().prologEngine;
-                var fn = pl.type.is_atom( name ) ? ctx[name.id] : name.toJavaScript();
-                if( typeof fn === "function" ) {
-                    var pointer = source;
-                    var pltojs;
-                    var arr = [];
-                    var sourceArr = [];
-                    while( pointer.indicator === "./2" ) {
-                        pltojs = pointer.args[0].toJavaScript();
-                        if( pltojs === undefined ) {
-                            thread.throw_error( pl.error.domain( "javascript_object", pointer.args[0], atom.indicator ) );
-                            return undefined;
-                        }
-                        sourceArr.push( pltojs );
-                        pointer = pointer.args[1];
-                    }
-                    if( pl.type.is_variable( pointer ) ) {
-                        thread.throw_error( pl.error.instantiation( atom.indicator ) );
-                        return;
-                    } else if( pointer.indicator !== "[]/0" ) {
-                        thread.throw_error( pl.error.type( "list", args, atom.indicator ) );
-                        return
-                    }
-                    arr.push(sourceArr);
-                    arr.push(type.id);
-                    arr.push(value.id);
-                    var res;
-                    try {
-                        res = fn.apply( ctx, arr );
-                    } catch( e ) {
-                        thread.throw_error( pl.error.javascript( e.toString(), atom.indicator ) );
-                        return;
-                    }
-                    res = pl.fromJavaScript.apply( res );
-                    //thread.prepend( [new pl.type.State( point.goal.replace( new pl.type.Term( "=", [res, result] ) ), point.substitution, point )] );
-                    thread.success(point);
-                }
+                 }
+                //var ctx = context.toJavaScript().prologEngine;
+
+                //var fn = pl.type.is_atom( name ) ? ctx[name.id] : name.toJavaScript();
+
+                plEngine.prologToJsEventEmitter.emit(type.id, value.event);
+                thread.success(point);
+                // if( typeof fn === "function" ) {
+                //     var pointer = source;
+                //     var pltojs;
+                //     var arr = [];
+                //     var sourceArr = [];
+                //     while( pointer.indicator === "./2" ) {
+                //         pltojs = pointer.args[0].toJavaScript();
+                //         if( pltojs === undefined ) {
+                //             thread.throw_error( pl.error.domain( "javascript_object", pointer.args[0], atom.indicator ) );
+                //             return undefined;
+                //         }
+                //         sourceArr.push( pltojs );
+                //         pointer = pointer.args[1];
+                //     }
+                //     if( pl.type.is_variable( pointer ) ) {
+                //         thread.throw_error( pl.error.instantiation( atom.indicator ) );
+                //         return;
+                //     } else if( pointer.indicator !== "[]/0" ) {
+                //         thread.throw_error( pl.error.type( "list", args, atom.indicator ) );
+                //         return
+                //     }
+                //     arr.push(sourceArr);
+                //     arr.push(type.id);
+                //     arr.push(value.id);
+                //     var res;
+                //     try {
+                //         res = fn.apply( ctx, arr );
+                //     } catch( e ) {
+                //         thread.throw_error( pl.error.javascript( e.toString(), atom.indicator ) );
+                //         return;
+                //     }
+                //     res = pl.fromJavaScript.apply( res );
+                //     //thread.prepend( [new pl.type.State( point.goal.replace( new pl.type.Term( "=", [res, result] ) ), point.substitution, point )] );
+                //     thread.success(point);
+                // }
             },
 
 
@@ -240,10 +234,52 @@ var plEngine;
                     }
                 }
             },
+
+
+            // create_object/1 //TODO add to exports
+            "create_object/1": function( thread, point, atom ) {
+                var object = atom.args[0];
+                if( !pl.type.is_variable(object)) {
+                    thread.throw_error( pl.error.instantiation( atom.indicator ) );
+                } else {
+                    var no = new Object();
+                    thread.prepend( [new pl.type.State( point.goal.replace( new pl.type.Term( "=", [no, object] ) ), point.substitution, point )] );
+
+                }
+            },
+
+            // create_event/1
+            "create_event/1": function( thread, point, atom ) {
+                var event = atom.args[0];
+                if( !pl.type.is_variable(event)) {
+                    thread.throw_error( pl.error.instantiation( atom.indicator ) );
+                } else {
+                    var ne = new pl.type.IOEvent("engine_event", {}, Date.now())
+                    thread.prepend( [new pl.type.State( point.goal.replace( new pl.type.Term( "=", [ne, event] ) ), point.substitution, point )] );
+                }
+            },
+
+
+            "set_prop/3": function( thread, point, atom ) {
+                var context = atom.args[0], name = atom.args[1], result = atom.args[2];
+                if( pl.type.is_variable( context ) || pl.type.is_variable( name ) || pl.type.is_variable( result ) ) {
+                    thread.throw_error( pl.error.instantiation( atom.indicator ) );
+                } else if( !pl.type.is_atom( name ) ) {
+                    thread.throw_error( pl.error.type( "atom", name, atom.indicator ) );
+                } else {
+                    var fn = context.toJavaScript();
+                    fn[name.id] = result.toJavaScript();
+                    thread.success(point)
+
+
+                }
+            }
+            //TODO create add_property/3 to add a property to a js obj
+
         };
     };
 
-    var exports = ["arg_name/2","parse_query/2", "trigger_external_event/3", "report_asset_value/1", "stop_monitor_deviceparameter/2", "monitor_deviceparameter/2",  "bind_external_event/4", "unbind_external_event/2", "unbind_event/3", "external_event_property/3" /*, "property/3"*/];
+    var exports = ["arg_name/2","parse_query/2", "trigger_external_event/2", "report_asset_value/1", "stop_monitor_deviceparameter/2", "monitor_deviceparameter/2",  "bind_external_event/3", "unbind_external_event/2", "unbind_event/3", "external_event_property/3", "create_object/1","create_event/1", "set_prop/3" /*, "property/3"*/];
 
 
 
@@ -414,7 +450,8 @@ var plEngine;
 
         // toString
         pl.type.IOEvent.prototype.toString = function () {
-            return "<event>(" + this.type.toLowerCase() + ")";
+            // return "<event>(" + this.type.toLowerCase() + ")";
+            return  JSON.stringify(this.event);
         };
 
         // clone
@@ -475,9 +512,9 @@ var plEngine;
         // pl.fromJavaScript.test.event = function (obj) {
         //     return obj instanceof Event;
         // };
-        // pl.fromJavaScript.conversion.event = function (obj) {
-        //     return new pl.type.IOEvent(obj.type, obj);
-        // };
+        pl.fromJavaScript.conversion.event = function (obj) {
+            return new pl.type.IOEvent(obj.type, obj);
+        };
 
     }
 
@@ -490,7 +527,8 @@ var plEngine;
         var add = function(evt, fn) {
 
             if(plEngine){
-                plEngine.addListener(evt, fn);
+
+                plEngine.addEventListener(evt, fn);
 
             }
             return true;

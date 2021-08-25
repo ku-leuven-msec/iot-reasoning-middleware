@@ -11,14 +11,10 @@ asset(S, device ):- asset(S, temperature_sensor).
 asset(S, device):- asset(S, thermostat).
 asset(S, device):- asset(S, humidifies).
 
-
-
 device_action(temp_sens_1, temperature, [read, notify]).
 device_action(temp_sens_1, humidity, [read, notify]).
 device_action(thermostat_1, temperature, [read, write]).
 device_action(humidifier_1, state, [read, write]).
-
-
 
 location(temp_sens_1, room1).
 location(thermostat_1, room1).

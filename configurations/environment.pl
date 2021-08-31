@@ -1,15 +1,15 @@
-asset(room1, room).
-asset(room2, room).
-asset(house1, house).
-asset(jan, person).
+room(room1).
+room(room2).
+house(house1).
+person(jan).
 
-asset(temp_sens_1,temperature_sensor).
-asset(thermostat_1,thermostat).
-asset(humidifier_1,humidifier).
+temperature_sensor(temp_sens_1).
+thermostat(thermostat_1).
+humidifier(humidifier_1).
 
-asset(S, device ):- asset(S, temperature_sensor).
-asset(S, device):- asset(S, thermostat).
-asset(S, device):- asset(S, humidifies).
+device(S):- temperature_sensor(S).
+device(S):- thermostat(S).
+device(S):- humidifier(S).
 
 device_action(temp_sens_1, temperature, [read, notify]).
 device_action(temp_sens_1, humidity, [read, notify]).
@@ -25,10 +25,10 @@ location(temp_sens_1, house1).
 owner(jan, room1).
 location(jan, room1).
 
-map(R, heat, Dev, temperature) :- asset(R, room), location(Dev,R).
-map(R, humidity, Dev, humidity) :- asset(R, room), location(Dev,R).
-map(R, climate, R, temperature) :- asset(R, room).
-map(R, climate, R, humidity) :- asset(R, room).
+map(R, heat, Dev, temperature) :- room(R), location(Dev,R).
+map(R, humidity, Dev, humidity) :- room(R), location(Dev,R).
+map(R, climate, R, temperature) :- room(R).
+map(R, climate, R, humidity) :- room(R).
 
 filter_type(temp_sens_1, temperature,  absolute_difference, [delta=5]).
 filter_type(temp_sens_1, humidity,  pass, _).

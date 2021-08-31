@@ -5,21 +5,24 @@
 :- use_module(library(connector)).
 
 :- use_module('./modules/access_control.pl').
+:- use_module('./modules/asset_device_conversion.pl').
+
 :- use_module('./modules/app.pl').
 :- use_module('./modules/data_preprocessing.pl').
 :- use_module('./modules/bus.pl').
 :- use_module('./modules/query.pl').
 :- use_module('./modules/device.pl').
-:- use_module('./modules/asset_device_conversion.pl').
 
 :- use_module('./utilities.pl').
 
-
+:- use_module('./configurations/access_control.pl').
 :- use_module('./configurations/middleware.pl').
 %:- use_module('./configurations/environment.pl').
-:- use_module('./configurations/environment_10000_1+persons.pl').
+%:- use_module('./configurations/manufacturing_environment.pl').
+:- use_module('./configurations/manufacturing_environment_5000_1.pl').
+%:- use_module('./configurations/environment_10000_1+defined_assets.pl').
 
-:- use_module('./configurations/access_control.pl').
+
 
 
 %init rule - must be executed to start the reasoning

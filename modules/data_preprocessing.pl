@@ -5,6 +5,7 @@
 :- use_module(library(random)).
 
 handle(Event) :-
+    info(['in data preprocessing']),
         event_id(Event, EventId),
         event_subject(Event, SubjectId),
         event_update_property(Event, UpdateProperty),
@@ -20,7 +21,7 @@ handle_data(SubjectId,Data) :-
              is_list(Data) ->  maplist(handle_data(SubjectId), Data);
              (data_parameter(Data, ParameterName),
              data_value(Data, New),
-             (filter(SubjectId, Data) -> (set_parameter_value(SubjectId, ParameterName, New),create_parameter_update_event(Event, SubjectId, Data),forward(Event, data_preprocessing));true)).
+             (filter(SubjectId, Data) -> (set_parameter_value(SubjectId, ParameterName, New), create_parameter_update_event(Event, SubjectId, Data), forward(Event, data_preprocessing));true)).
 
 filter(SubjectId,Data) :-
         data_parameter(Data, ParameterName),

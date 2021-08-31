@@ -4,7 +4,9 @@
 
 handle(Event) :-
         event_subject(Event, Subj),
-        asset(Subj, device),
+        device(Subj),
+                info(['send to device', Subj ]),
+
         % TODO: sent to framework
         trigger_external_event('action', Event).
 

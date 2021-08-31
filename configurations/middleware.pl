@@ -7,14 +7,14 @@ connection(query, app, 'query-result').
 connection(access_control, app, update).
 connection(access_control, bus, action).
 connection(access_control, bus, query).
-%connection(bus, access_control, update).
+connection(bus, access_control, update).
 connection(bus, device, action).
 connection(device, data_preprocessing, update).
 connection(data_preprocessing, bus, update).
 
 connection(bus, asset_device_conversion, update).
 connection(bus, asset_device_conversion, action).
-connection(asset_device_conversion, bus, update).
+%connection(asset_device_conversion, bus, update).
 connection(asset_device_conversion, bus, action).
 connection(asset_device_conversion, data_preprocessing, update).
 

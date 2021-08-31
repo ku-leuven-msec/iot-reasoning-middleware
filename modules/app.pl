@@ -5,6 +5,11 @@
 
 handle(Event) :-
         info(['in handle app']),
+        (event_type(Event, 'query-result') -> trigger_external_event('query-result', Event));
+        (event_type(Event, 'update') -> trigger_external_event('update', Event)).
+
+handle(Event) :-
+        info(['in handle app']),
         event_type(Event, 'query-result'),
         event_origin_event(Event, OriginID),
         trigger_external_event('query-result', Event).

@@ -9,6 +9,8 @@ require("tau-prolog/modules/promises")(pl);
 const events = require('events');
 var prologEngine;
 
+
+
 class PrologEngine {
     constructor() {
         console.log('engine')
@@ -16,11 +18,41 @@ class PrologEngine {
         this.jsToPrologEventEmitter = new events.EventEmitter();
         this.prologToJsEventEmitter = new events.EventEmitter();
 
-        //prologEngine = this;
+        // prologEngine = this;
         //needed so tau prolog can access this engine to
         //global.prologEngine  = this;
+    }
+
+    monitor(asset, listener) {
+        var randomId = Math.floor(Math.random() * 100);
+        this.jsToPrologEventEmitter.emit('app_event', {
+            type: "action",
+            action: "notify",
+            id: randomId,
+            creator: "app",
+            subject: asset,
+            data: {
+                parameter: "alarm"
+            }
+        });
+
+        this.addListener('update', evt => {
+                if (evt.subject === asset) listener(evt);
+            })
 
     }
+
+    read(asset, listener) {
+        this.jsToPrologEventEmitter.emit('app_event', {
+            type: "action",
+            action: "read",
+            id: randomId,
+            creator: "jan",
+            subject: asset
+        });
+    }
+
+
 
     addEventListener(evt, fn) {
         this.jsToPrologEventEmitter.on(evt, fn);
@@ -69,6 +101,7 @@ class PrologEngine {
         });
 
     }
+
 }
 
 exports.PrologEngine = PrologEngine;

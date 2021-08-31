@@ -237,12 +237,12 @@ var plEngine;
 
 
             // create_object/1 //TODO add to exports
-            "create_object/1": function( thread, point, atom ) {
+            "new_object/1": function( thread, point, atom ) {
                 var object = atom.args[0];
                 if( !pl.type.is_variable(object)) {
                     thread.throw_error( pl.error.instantiation( atom.indicator ) );
                 } else {
-                    var no = new Object();
+                    var no = new pl.type.Data({});
                     thread.prepend( [new pl.type.State( point.goal.replace( new pl.type.Term( "=", [no, object] ) ), point.substitution, point )] );
 
                 }
@@ -254,7 +254,7 @@ var plEngine;
                 if( !pl.type.is_variable(event)) {
                     thread.throw_error( pl.error.instantiation( atom.indicator ) );
                 } else {
-                    var ne = new pl.type.IOEvent("engine_event", {}, Date.now())
+                    var ne = new pl.type.IOEvent("engine_event", {creator:'engine'}, Date.now())
                     thread.prepend( [new pl.type.State( point.goal.replace( new pl.type.Term( "=", [ne, event] ) ), point.substitution, point )] );
                 }
             },
@@ -279,7 +279,7 @@ var plEngine;
         };
     };
 
-    var exports = ["arg_name/2","parse_query/2", "trigger_external_event/2", "report_asset_value/1", "stop_monitor_deviceparameter/2", "monitor_deviceparameter/2",  "bind_external_event/3", "unbind_external_event/2", "unbind_event/3", "external_event_property/3", "create_object/1","create_event/1", "set_prop/3" /*, "property/3"*/];
+    var exports = ["arg_name/2","parse_query/2", "trigger_external_event/2", "report_asset_value/1", "stop_monitor_deviceparameter/2", "monitor_deviceparameter/2",  "bind_external_event/3", "unbind_external_event/2", "unbind_event/3", "external_event_property/3", "new_object/1","create_event/1", "set_prop/3" /*, "property/3"*/];
 
 
 
@@ -514,6 +514,47 @@ var plEngine;
         // };
         pl.fromJavaScript.conversion.event = function (obj) {
             return new pl.type.IOEvent(obj.type, obj);
+        };
+
+
+
+        // DATA OBJECTS
+
+        // Is a IO Event object
+        pl.type.is_data_object = function (obj) {
+            return obj instanceof pl.type.Data;
+        };
+
+        // Ordering relation
+        pl.type.order.push(pl.type.Data);
+
+        // IO Event Prolog object
+        pl.type.Data = function (data) {
+            this.data = data;
+        }
+
+        // toString
+        pl.type.Data.prototype.toString = function () {
+            // return "<event>(" + this.type.toLowerCase() + ")";
+            return  JSON.stringify(this.data);
+        };
+
+
+        // apply substitutions
+        pl.type.Data.prototype.apply = function (_) {
+            return this;
+        };
+
+        // unify
+        pl.type.Data.prototype.unify = function (obj, _) {
+            if (pl.type.is_data_object(obj) && this.data === obj.data ) {
+                return new pl.type.State(obj, new pl.type.Substitution());
+            }
+            return null;
+        };
+
+        pl.type.Data.prototype.toJavaScript = function () {
+            return this.data;
         };
 
     }

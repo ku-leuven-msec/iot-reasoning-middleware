@@ -9,12 +9,13 @@ out([H|T]) :- write(H), write(' '), out(T).
 
 % create_object(+Object) creëert een nieuw leeg object, properties kunne ndynamisch aan het object toegevoegd worden gebruikmakend van het predicaat property(+Object, +PropertyName, +Value).
 %create_object(O) :- random(R), O is R,  asserta(object(O)).
-%create_property(Obj, Prop, Value):- \+property(Obj, Prop, Value), asserta(property(Obj, Prop, Value)).
-%set_property(Obj, Prop, Value) :- retractall(property(Obj, Prop, _)), create_property(Obj, Prop, Value).
+create_parameter(Obj, Prop, Value):- \+property(Obj, Prop, Value), asserta(property(Obj, Prop, Value)).
+set_parameter(Obj, Prop, Value) :- retractall(property(Obj, Prop, _)), create_parameter(Obj, Prop, Value).
 
 %TODO generic create event
 create_parameter_update_event(Event, SubjectId, ParameterName, Value) :-
-    create_object(Data),
+        info([update_evenet]),
+    new_object(Data),
     set_prop(Data, parameter, ParameterName),
     set_prop(Data, value, Value),
     random(ID),
@@ -26,7 +27,7 @@ create_parameter_update_event(Event, SubjectId, ParameterName, Value) :-
     set_prop(Event, data, Data).
 
 create_update_event(Event, SubjectId, ParameterName, Value) :-
-    create_object(Data),
+    new_object(Data),
     set_prop(Data, parameter, ParameterName),
     set_prop(Data, value, Value),
     random(ID),
@@ -45,14 +46,29 @@ create_parameter_update_event(Event, SubjectId, Data) :-
         set_prop(Event, type, update),
         set_prop(Event, data, Data).
 
-create_action_event(Event, SubjectId, ParameterName, Value) :-
+create_action_event(write, Event, SubjectId, ParameterName, Value) :-
         random(ID),
         create_event(Event),
         set_prop(Event, id, ID),
-        set_prop(Event, subject, SubjectId),
         set_prop(Event, type, action),
-        set_prop(Event, parameter, ParameterName),
-        set_prop(Event, value, Value).
+        set_prop(Event, action, write),
+        set_prop(Event, subject, SubjectId),
+        info([Event, SubjectId, ParameterName, Value]),
+        new_object(Data),
+        set_prop(Data, parameter, ParameterName),
+        set_prop(Data, value, Value),
+        set_prop(Event, data, Data).
+
+create_action_event(ActionType, Event, SubjectId, ParameterName) :-
+        random(ID),
+        create_event(Event),
+        set_prop(Event, id, ID),
+        set_prop(Event, type, action),
+        set_prop(Event, action, ActionType),
+        set_prop(Event, subject, SubjectId),
+        new_object(Data),
+        set_prop(Data, parameter, ParameterName),
+        set_prop(Event, data, Data).
 
 create_query_result_event(Event, OriginID, Result) :-
         random(ID),
@@ -66,7 +82,9 @@ create_query_result_event(Event, OriginID, Result) :-
 %event_<prop>(+Event, +PropName) requests property <prop> of the event.
 event_id(Event, Id) :- prop(Event, id, Id);property(Event, id, Id).
 event_type(Event, Type) :- prop(Event, type, Type); property(Event, type, Type).
-event_creator(Event, Creator) :- prop(Event, creator, Creator);property(Event, creator, Creator).
+event_action(Event, Action) :- prop(Event, action, Action).
+
+event_creator(Event, Creator) :- prop(Event, creator, Creator).
 event_origin_event(Event, OriginID) :- prop(Event, 'origin-event', OriginID);property(Event, 'origin-event', OriginID).
 event_subject(Event, Subject) :- prop(Event, subject, Subject); property(Event, subject, Subject).
 event_data(Event, Data) :- prop(Event, data, Data); property(Event, data, Data).
@@ -110,20 +128,21 @@ parameter_value(Object, ParamName, Value):-
 
 add_parameter(Object, Name, Value) :-
     random(UUID),
-    create_property(UUID, name, Name),
-    create_property(UUID, value, Value),
+    create_parameter(UUID, name, Name),
+    create_parameter(UUID, value, Value),
     property(UUID, value, Test),
     get_time(CurrentTime),
-    create_property(UUID, time, CurrentTime),
+    create_parameter(UUID, time, CurrentTime),
     (property(Object, parameters, LST) -> (
         append(LST, [UUID], NEWLST),
-        set_property(Object, parameters, NEWLST));
-        (create_property(Object, parameters,[UUID]))).
+        set_parameter(Object, parameters, NEWLST));
+        (create_parameter(Object, parameters,[UUID]))).
 
 set_parameter_value(Object,ParameterName, NewValue) :-
                info(['UPDATE', Object, ParameterName, NewValue]),
               parameter(Object, ParameterName, Parameter) ->
 %                   parameter already exists
-                    set_property(Parameter, value, NewValue);
+
+                    (info(['SET PARAMETER']),set_parameter(Parameter, value, NewValue));
 %                   parameter does not yet exist
-                    add_parameter(Object, ParameterName, NewValue).
+                    (info(['ADD PARAMETER']), add_parameter(Object, ParameterName, NewValue)).

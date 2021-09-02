@@ -4,18 +4,26 @@ const { PerformanceObserver, performance } = require('perf_hooks');
 const fs = require('fs')
 
 const test_amount = 100;
-const manufacturing_halls = 5000;
-const machines_per_room = 1;
+const prod_lines = 4
+const machines_per_line = 2;
+
+const timeBeforeFirstEvent = 5000;
+
+const extra_assets = false;
+const amount_of_extra_assets = 500;
 
 const obs = new PerformanceObserver((items) => {
-    fs.appendFileSync("performance_action"+manufacturing_halls+"_"+machines_per_room+".txt", items.getEntries()[0].duration+"\n" );
+    if (extra_assets){ fs.appendFileSync("tests/results/performance_action_"+amount_of_extra_assets+"_extra_assets_"+prod_lines+"_"+machines_per_line+".txt", items.getEntries()[0].duration+"\n" );}
+    else fs.appendFileSync("tests/results/performance_action_"+prod_lines+"_"+machines_per_line+".txt", items.getEntries()[0].duration+"\n" );
+
+
 });
 obs.observe({ entryTypes: ['measure'] });
 
-const plEngine = require("../prologengine");
+const plEngine = require("../core/prologengine");
 
 var prologEngine = new plEngine.PrologEngine();
-prologEngine.run();
+prologEngine.run("./configurations/manufacturing_environment.pl");
 
 
 var counter=0;
@@ -23,27 +31,28 @@ var internal_counter=0;
 prologEngine.addListener("action", event => {
     counter++;
     internal_counter++;
-    if(counter< test_amount*machines_per_room && internal_counter==machines_per_room) {
+    if(counter< test_amount*machines_per_line && internal_counter==machines_per_line) {
         performance.mark('action_'+internal_counter);
         performance.measure('performance-action', 'start-action', 'action_'+internal_counter);
         performance.clearMarks();
         internal_counter=0;
-        simulateAppEvent();
+        setTimeout(simulateAppEvent, 500);
     }
-    if(counter>= test_amount*machines_per_room) console.log("done");
+    if(counter>= test_amount*machines_per_line) console.log("done");
 });
 
 
-setTimeout(simulateAppEvent, 20000);
+setTimeout(simulateAppEvent, timeBeforeFirstEvent);
 process.stdin.resume();
 
 
 function simulateAppEvent(){
     var randomId = Math.floor(Math.random() * 100);
-    var lastHall = manufacturing_halls-1;
+    var lastline = prod_lines-1;
+
     console.log("send-event_"+counter)
     performance.mark('start-action');
-    prologEngine.jsToPrologEventEmitter.emit('app_event', {type:"action", action:'write', id:randomId, creator:"app", subject:"hall_"+lastHall, data:{parameter:"state", value:"on"}});
+    prologEngine.jsToPrologEventEmitter.emit('app_event', {type:"action", action:'write', id:randomId, creator:"app", subject:"line_"+lastline, data:{parameter:"state", value:"on"}});
 }
 
 

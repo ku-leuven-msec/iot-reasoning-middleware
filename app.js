@@ -1,7 +1,7 @@
-const plEngine = require("./prologengine");
+const plEngine = require("./core/prologengine");
 
 var prologEngine = new plEngine.PrologEngine();
-prologEngine.run();
+prologEngine.run("./configurations/manufacturing_environment.pl");
 
 
 prologEngine.addListener("query-result", event => {
@@ -14,18 +14,16 @@ prologEngine.addListener("action", event => {
     console.log(event);
 });
 
-//simulateQueryEvents()
+simulateQueryEvents();
 simulateDeviceEvents();
-//simulateAppEvents();
+simulateAppEvents();
 setTimeout(simulateMonitor, 5000);
 
 function simulateMonitor(){
     prologEngine.monitor('hall_1', evt => {
-        console.log(evt)
+        console.log(evt);
     })
 }
-
-
 
 
 
@@ -57,8 +55,8 @@ function simulateDeviceEvent(){
     var randomDataInt2 = Math.floor(Math.random() * 100);
 
     //eventEmitter.emit('device_event', {type:"update", id:randomId, creator:"temp_sensor_1", subject:"temp_sens_1", data:[{parameter:"humidity", value:randomDataInt2},{parameter:"temperature", value:randomDataInt}], update_property: "parameter"});
-    //prologEngine.jsToPrologEventEmitter.emit('device_event', {type:"update", id:randomId, creator:"temp_sensor_1", subject:"temp_sens_1", data:{parameter:"temperature", value:26}, update_property: "parameter"});
-    prologEngine.jsToPrologEventEmitter.emit('device_event', {type:"update", id:randomId, creator:"machine_1", subject:"machine_1", data:{parameter:"alarm", value:"on"}, update_property: "parameter"});
+    prologEngine.jsToPrologEventEmitter.emit('device_event', {type:"update", id:randomId, creator:"temp_sensor_1", subject:"temp_sens_1", data:{parameter:"temperature", value:26}, update_property: "parameter"});
+    // prologEngine.jsToPrologEventEmitter.emit('device_event', {type:"update", id:randomId, creator:"machine_1", subject:"machine_1", data:{parameter:"alarm", value:"on"}, update_property: "parameter"});
 
 }
 

@@ -1,0 +1,12 @@
+diff --git a/node_modules/tau-prolog/modules/core.js b/node_modules/tau-prolog/modules/core.js
+index 7d45b34..01b101f 100644
+--- a/node_modules/tau-prolog/modules/core.js
++++ b/node_modules/tau-prolog/modules/core.js
+@@ -2660,6 +2660,7 @@
+ 		opts.script = options.script === undefined ? true : options.script;
+ 		opts.success = options.success === undefined ? callback : options.success;
+ 		opts.error = options.error === undefined ? callback : options.error;
++		opts.reconsult = options.reconsult === undefined ? false : options.reconsult;
+ 		// string
+ 		if(typeof program === "string") {
+ 			string = program;

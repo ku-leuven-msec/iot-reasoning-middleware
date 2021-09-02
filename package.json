@@ -4,7 +4,8 @@
   "description": "a Prolog based IoT reasoning middleware in JavaScript",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,10 @@
   ],
   "author": "Ilse Bohe & Jorn Lapon <firstname.lastname@kuleuven.be>",
   "dependencies": {
+    "simple-statistics": "^7.7.0",
     "tau-prolog": "^0.3.1"
+  },
+  "devDependencies": {
+    "patch-package": "^6.4.7"
   }
 }

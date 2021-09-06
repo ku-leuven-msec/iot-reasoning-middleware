@@ -22,8 +22,10 @@ handle_update_event(Event) :-
     event_data(Event, Data),
     data_parameter(Data, ParameterName),
     info(['inupdatevent',Subj,ParameterName]),
-    forall(map(Asset, AssetParam, Subj, ParameterName),
-    (info([Asset,AssetParam]), handle_update(Asset, AssetParam))).
+    print(beforemap), get_time(T), print(T),
+    map(Asset, AssetParam, Subj, ParameterName),
+    print(aftermap), get_time(T2), print(T2),
+    handle_update(Asset, AssetParam), false.
 
 handle_action_event(Event) :-
     event_subject(Event, Subj),
@@ -53,14 +55,14 @@ handle_write_event(Event) :-
     data_parameter(Data, ParameterName),
     data_value(Data, Value),
     info([Subj, ParameterName, Value]),
-    set_value(Subj, ParameterName, Value), false.
+    get_time(T), print(beforesetvalue+T), set_value(Subj, ParameterName, Value),false.
 
 handle_update(Asset,Param):-
-     get_value(Asset,Param,V), info([handle, Asset, Param, V]), create_parameter_update_event(NewEvent, Asset,Param,V) ,forward(NewEvent, asset_device_conversion).
+    info([inhandleupdate]), get_time(T), print(beforegetvalue+T),get_value(Asset,Param,V), get_time(T2), print(aftergetvalue+T2), info([handle, Asset, Param, V]), get_time(T3), print(beforecreateevent+T3) ,create_parameter_update_event(NewEvent, Asset,Param,V),  get_time(T4), print(aftercreateevent+T4),forward(NewEvent, asset_device_conversion), get_time(T5), print(aftercreateandforwardevent+T5).
 
 get_value(Dev, ParamName, Val):- device(Dev), parameter(Dev, ParamName, Param), property(Param, value, Val).
 
-set_value(Dev, ParamName, Value) :- info(['set value', Dev, ParamName, Value]), device(Dev), info(['is a device']), action_type(Dev, ParamName, write), create_action_event(write, Event, Dev, ParamName, Value), forward(Event, asset_device_conversion).
+set_value(Dev, ParamName, Value) :- info(['set value', Dev, ParamName, Value]), device(Dev), info(['is a device']), action_type(Dev, ParamName, write), get_time(T2), print(aftersetvalue+T2), create_action_event(write, Event, Dev, ParamName, Value), forward(Event, asset_device_conversion).
 
 
 %:- use_module('./configurations/asset_device_conversion.pl').

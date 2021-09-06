@@ -2,7 +2,11 @@
 :- use_module(library(js)).
 :- use_module(library(connector)).
 
-print(P) :- write(P),nl.
+%print(P) :- write(P),nl.
+
+start_time(T) :- get_time(T).
+end_time(Label, T) :- get_time(T2) ,T3 is T2-T, write(Label), write(" "), write(T3), nl.
+print(P).
 
 info(LST).
 %info(LST) :-write('INFO '), out(LST), nl.
@@ -16,7 +20,7 @@ out([H|T]) :- write(H), write(' '), out(T).
 
 %set_prop(E, T, V) :- asserta(property(E, T, V)).
 create_parameter(Obj, Prop, Value):- \+property(Obj, Prop, Value), asserta(property(Obj, Prop, Value)).
-set_parameter(Obj, Prop, Value) :- retractall(property(Obj, Prop, _)), create_parameter(Obj, Prop, Value).
+set_parameter(Obj, Prop, Value) :-  retract(property(Obj, Prop, _)),  create_parameter(Obj, Prop, Value).
 
 %TODO generic create event
 create_parameter_update_event(Event, SubjectId, ParameterName, Value) :-
@@ -129,10 +133,12 @@ parameter(Object, Name, Parameter):-
      property(Parameter, name, Name).
 
 parameter_value(Object, ParamName, Value):-
-    parameter(Object, ParamName, Param),
+    info([Object, ParamName]),
+    parameter(Object, ParamName, Param),info([Param]),
     property(Param, value, Value).
 
 add_parameter(Object, Name, Value) :-
+    get_time(T), print(inaddparameter+T),
     random(UUID),
     create_parameter(UUID, name, Name),
     create_parameter(UUID, value, Value),
@@ -142,7 +148,7 @@ add_parameter(Object, Name, Value) :-
     (property(Object, parameters, LST) -> (
         append(LST, [UUID], NEWLST),
         set_parameter(Object, parameters, NEWLST));
-        (create_parameter(Object, parameters,[UUID]))).
+        (create_parameter(Object, parameters,[UUID]))), get_time(T2), print(afteraddparameter+T2).
 
 set_parameter_value(Object,ParameterName, NewValue) :-
                info(['UPDATE', Object, ParameterName, NewValue]),

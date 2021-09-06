@@ -6,9 +6,9 @@ connection(query, app, 'query-result').
 
 connection(access_control, app, update).
 connection(access_control, bus, action).
-connection(access_control, query
-, query).
-connection(bus, access_control, update).
+connection(access_control, query, query).
+%connection(bus, access_control, update).
+connection(bus, app, update).
 connection(bus, device, action).
 connection(device, data_preprocessing, update).
 connection(data_preprocessing, bus, update).

@@ -4,8 +4,8 @@ const { PerformanceObserver, performance } = require('perf_hooks');
 const fs = require('fs')
 
 const test_amount = 100;
-const prod_lines = 4;
-const machines_per_line = 2;
+const prod_lines = 10;
+const machines_per_line = 50;
 
 const timeBeforeFirstEvent = 5000;
 
@@ -23,7 +23,7 @@ obs.observe({ entryTypes: ['measure'] });
 const plEngine = require("../core/prologengine");
 
 var prologEngine = new plEngine.PrologEngine();
-prologEngine.run("./configurations/manufacturing_environment.pl");
+prologEngine.run("./tests/configurations/manufacturing_environment_"+prod_lines+"_"+machines_per_line+".pl");
 
 
 var counter=0;

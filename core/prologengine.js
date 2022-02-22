@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require("path");
 
 var pl = require('tau-prolog');
 require("tau-prolog/modules/js")(pl);
@@ -21,7 +22,7 @@ class PrologEngine {
         require("./connector")(pl, this);
         this.jsToPrologEventEmitter = new events.EventEmitter();
         this.prologToJsEventEmitter = new events.EventEmitter();
-        this.program = fs.readFileSync("core/main.pl").toString();
+        this.program = fs.readFileSync(path.resolve(__dirname, "./main.pl")).toString();
 
         // prologEngine = this;
         //needed so tau prolog can access this engine to

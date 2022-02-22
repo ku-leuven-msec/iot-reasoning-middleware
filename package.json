@@ -1,5 +1,5 @@
 {
-  "name": "@distrinet/reasoning-middleware",
+  "name": "@ilse_b/reasoning-middleware",
   "version": "1.0.0",
   "description": "a Prolog based IoT reasoning middleware in JavaScript",
   "main": "app.js",
@@ -25,5 +25,13 @@
   },
   "devDependencies": {
     "patch-package": "^6.4.7"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/ku-leuven-msec/iot-reasoning-middleware/issues"
+  },
+  "homepage": "https://github.com/ku-leuven-msec/iot-reasoning-middleware#readme",
+  "directories": {
+    "test": "tests"
+  },
+  "license": "ISC"
 }

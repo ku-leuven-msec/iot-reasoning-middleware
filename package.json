@@ -21,9 +21,7 @@
   "author": "Ilse Bohe & Jorn Lapon <firstname.lastname@kuleuven.be>",
   "dependencies": {
     "simple-statistics": "^7.7.0",
-    "tau-prolog": "^0.3.1"
-  },
-  "devDependencies": {
+    "tau-prolog": "^0.3.1",
     "patch-package": "^6.4.7"
   },
   "bugs": {
